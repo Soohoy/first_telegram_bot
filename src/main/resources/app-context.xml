@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   					   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   					   http://www.springframework.org/schema/tx
+	   					   http://www.springframework.org/schema/tx/spring-tx.xsd
+	   					   http://www.springframework.org/schema/util
+	   					   http://www.springframework.org/schema/util/spring-util.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd">
+    <tx:annotation-driven/>
+    <context:component-scan base-package="ru.sukhorukov"/>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+          p:driverClassName="com.mysql.jdbc.Driver"
+          p:url="jdbc:mysql://localhost:3306/telegram_bot?serverTimezone=UTC"
+          p:username="root"
+          p:password="root"/>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+        p:sessionFactory-ref="sessionFactory"/>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+          p:dataSource-ref="dataSource"
+          p:packagesToScan="ru.sukhorukov"
+          p:hibernateProperties-ref="hibernateProperties"/>
+    <util:properties id="hibernateProperties">
+        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+        <prop key="hibernate.max_fetch_depth">3</prop>
+        <prop key="hibernate.jdbc.fetch_size">50</prop>
+        <prop key="hibernate.jdbc.batch_size">10</prop>
+        <prop key="hibernate.show_sql">true</prop>
+    </util:properties>
+
+    <bean id="serviceBot" class="ru.sukhorukov.service.ServiceBot">
+        <property name="userDao" ref="userDao"/>
+        <property name="messageDao" ref="messageDao"/>
+    </bean>
+
+</beans>
